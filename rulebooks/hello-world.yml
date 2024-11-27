@@ -1,0 +1,31 @@
+---
+- name: Hello Events
+  hosts: localhost
+  sources:
+    - ansible.eda.range:
+        limit: 6
+  rules:
+    - name: Hello World
+      condition: |
+        event.i in [4]
+      actions:
+      - run_playbook:
+          name: ./playbooks/hello-world.yml
+          extra_vars:
+            event: |-
+              {{ event }}
+          set_facts: true
+          post_events: true
+
+      - run_module:
+          name: ansible.builtin.debug
+          module_args:
+            msg: |-
+              what is the meaning? {{ the_meaning|default('unknown') }}
+
+              why?
+              {{ facts.the_meaning }}
+
+      # - print_event:
+      #     pretty: true
+      # - debug:

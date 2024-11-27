@@ -1,0 +1,18 @@
+---
+version: 3
+
+images:
+  base_image:
+    name: 'git.petardo.dk/runejuhl/unusual-ansible/minimal-execution-environment:latest'
+dependencies:
+  python: ../plugins/event_source/requirements.txt
+  galaxy:
+    collections:
+      - name: runejuhl.unusual_ansible
+additional_build_steps:
+  append_final:
+  - |
+    RUN sed -ri \
+    -e 's@LEGACY_CONFIG_SLUG = "api/v2/config/"@LEGACY_CONFIG_SLUG = "api/controller/v2/config/"@g' \
+    -e 's@LEGACY_UNIFIED_TEMPLATE_SLUG = "api/v2/unified_job_templates/"@LEGACY_UNIFIED_TEMPLATE_SLUG = "api/controller/v2/unified_job_templates/"@g' \
+    /usr/local/lib/python3.9/site-packages/ansible_rulebook/job_template_runner.py

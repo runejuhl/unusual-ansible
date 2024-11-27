@@ -1,0 +1,38 @@
+---
+- name: mqtt events
+  hosts: localhost
+  sources:
+    - runejuhl.unusual_ansible.mqtt:
+        host: '{{ dns_mqtt_server }}'
+        topic: 'dns'
+
+  rules:
+    - name: Run job on DNS lookup
+      # match hours 21, 22, 23, 00, 01, 02, 03, 04, 05, 06, 07 OR the right
+      # dates
+      condition: |-
+        event.payload.name is regex('roblox\.com$')
+        and
+        (
+          event.meta.received_at is regex('T(2[0-3]|0[0-7]):')
+          or
+          event.meta.received_at is regex('2024-11-28T')
+          or
+          event.meta.received_at is regex('2024-12-05T')
+        )
+      actions:
+      - run_job_template:
+          name: send_notification
+          organization: Default
+          job_args:
+            extra_vars:
+              message: |-
+                IP {{ event.payload.source }} has been naughty!
+              icon: |-
+                /usr/share/notify-osd/icons/Humanity/scalable/status/notification-network-wireless-disconnected.svg
+      - run_job_template:
+          name: unifi_throttle
+          organization: Default
+          job_args:
+            extra_vars:
+              throttle_client: true

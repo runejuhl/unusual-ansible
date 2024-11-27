@@ -1,0 +1,15 @@
+---
+- name: Clicker!
+  hosts: aegir
+  gather_facts: false
+  tasks:
+
+  - debug:
+      msg: |-
+        {{ ansible_eda.event }}
+
+  - ansible.builtin.command:
+      cmd: |-
+        wtype -k {% if ansible_eda.event.payload.action == 'arrow_left_click' %}Prior{% elif ansible_eda.event.payload.action == 'arrow_right_click' %}Next{% endif %}
+    environment:
+      WAYLAND_DISPLAY: "wayland-1"

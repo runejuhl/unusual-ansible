@@ -1,0 +1,4 @@
+---
+mqtt_server: drinks.net.petardo.dk
+awx_baseurl: https://awx.demo.internal
+awx_username: admin

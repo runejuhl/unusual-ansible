@@ -1,0 +1,18 @@
+---
+#version: '3.4'
+
+services:
+  logstash:
+    build:
+      context: .
+      dockerfile: Dockerfile.logstash
+    container_name: logstash
+    restart: unless-stopped
+    environment:
+    - "LS_JAVA_OPTS=-Xmx1g -Xms1g"
+    - "XPACK_MONITORING_ENABLED=false"
+    volumes:
+    - ./dns-pipeline.conf:/usr/share/logstash/pipeline/dns-pipeline.conf:ro
+    - /mangotank/data/services/pihole/logs/pihole.log:/var/log/pihole.log:ro
+    ports:
+    - "5044:5044"

@@ -1,0 +1,11 @@
+---
+- name: Send notification to Rune
+  hosts: aegir
+  gather_facts: false
+  tasks:
+
+  - ansible.builtin.command:
+      cmd: |-
+        notify-send {% if icon is defined %}-i '{{ icon }}'{% endif %} '{{ message }}'
+    environment:
+      WAYLAND_DISPLAY: "wayland-1"

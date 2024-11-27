@@ -1,0 +1,63 @@
+---
+- name: |-
+    Throttle wifi
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+  - name: Login
+    ansible.builtin.uri:
+      url: '{{ unifi_baseurl }}/api/login'
+      method: POST
+      headers:
+        content-type: 'application/json'
+      return_content: true
+      body:
+        {
+          "username":"{{ unifi_username }}",
+          "password":"{{ unifi_password }}",
+          "remember":false,
+          "strict":true
+        }
+      body_format: 'json'
+    register: login
+
+  - name: Get devices
+    ansible.builtin.uri:
+      url: '{{ unifi_baseurl }}/v2/api/site/default/clients/active?includeTrafficUsage=true&includeUnifiDevices=true'
+      headers:
+        Cookie: |-
+          {{ login.cookies_string }}
+        X-Csrf-Token: |-
+          {{ login.cookies.csrf_token }}
+      return_content: true
+    register: devices
+
+  - ansible.builtin.set_fact:
+      device: |-
+        {{ devices.json|selectattr('ip', 'eq', ansible_eda.event.payload.source) | first | default  }}
+
+  - when: |-
+      device
+    block:
+    - name: Throttle device if found
+      ansible.builtin.uri:
+        url: '{{ unifi_baseurl }}/api/s/default/rest/user/{{ device.user_id }}'
+        method: PUT
+        headers:
+          Cookie: |-
+            {{ login.cookies_string }}
+          X-Csrf-Token: |-
+            {{ login.cookies.csrf_token }}
+        return_content: true
+        body:
+          usergroup_id: |-
+            {% if throttle_client %}5ff6a0c246e0fb01138ed94f{% endif %}
+        body_format: 'json'
+      register: call_throttle
+
+    - ansible.builtin.debug:
+        msg: |
+          {{ call_throttle.json }}
+      when: |-
+        not call_throttle.json.meta.rc == "ok"

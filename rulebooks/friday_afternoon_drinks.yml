@@ -1,0 +1,33 @@
+---
+- name: 'Drinks by Home Assistant state'
+  hosts: localhost
+  sources:
+    - url_probe:
+        urls:
+        - '{{ hass_baseurl }}/api/states/person.rune'
+        headers:
+          Authorization: 'Bearer {{ hass_token }}'
+          content-type: application/json
+        delay: 5
+
+  rules:
+    - name: Any event
+      condition:
+        all:
+        - event.meta.source.name == 'url_probe'
+        - event.url_probe.body.state == 'not_home'
+        - facts.last_state != 'not_home'
+
+      actions:
+      - set_fact:
+          fact:
+            last_state: |-
+              {{ event.url_probe.body.state }}
+      - debug:
+          msg: |
+            Last state: {{ ansible_facts.last_state|default() }}
+            Current state: {{ event.url_probe.body.state }}
+
+        # run_job_template:
+        #   name: make_drinks
+        #   organization: Default

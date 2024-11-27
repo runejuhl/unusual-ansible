@@ -1,0 +1,21 @@
+---
+- name: http sse events
+  hosts: localhost
+  default_events_ttl: "2 seconds"
+  match_multiple_rules: false
+  sources:
+  - http_sse:
+      url: '{{ loo_roll_basename }}/events'
+      event_ids:
+      - binary_sensor-toilet_paper_situation_
+
+  rules:
+  - name: Detect no paper left on loo roll
+    condition:
+      all:
+      - event.data.value
+
+    actions:
+    - run_job_template:
+        name: loo_roll_empty
+        organization: Default

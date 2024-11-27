@@ -1,0 +1,10 @@
+FROM registry.redhat.io/ansible-automation-platform-25/de-supported-rhel8:latest
+
+RUN sed -ri \
+    's@LEGACY_CONFIG_SLUG = "api/v2/config/"@LEGACY_CONFIG_SLUG = "api/controller/v2/config/"@g' \
+    /usr/lib/python3.11/site-packages/ansible_rulebook/job_template_runner.py
+
+RUN pip3 install aiomqtt aiosseclient
+
+COPY ./plugins/event_source/http_sse.py /usr/share/ansible/collections/ansible_collections/ansible/eda/extensions/eda/plugins/event_source/
+COPY ./plugins/event_source/mqtt.py /usr/share/ansible/collections/ansible_collections/ansible/eda/extensions/eda/plugins/event_source/

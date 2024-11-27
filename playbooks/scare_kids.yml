@@ -1,0 +1,31 @@
+---
+- name: |-
+    Scare the neighborhood kids (and their parents too!)
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+  - name: Print hello
+    ansible.builtin.debug:
+      msg: |
+        hello
+        {{ ansible_eda.event|default() }}
+
+  - name: toggle light
+    ansible.builtin.uri:
+      url: '{{ hass_baseurl }}/api/services/light/toggle'
+      method: POST
+      headers:
+        content-type: 'application/json'
+        Authorization: |-
+          Bearer {{ hass_token }}
+      return_content: true
+      body:
+        entity_id: 'light.night_light'
+        effect: 'Night pulse'
+      body_format: 'json'
+    register: response
+
+  - debug:
+      msg: |
+        {{ response }}

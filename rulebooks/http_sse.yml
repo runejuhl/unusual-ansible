@@ -1,0 +1,17 @@
+---
+- name: http sse events
+  hosts: localhost
+  sources:
+  - http_sse:
+      url: http://192.168.1.157/events
+      event_ids:
+      - sensor-all_target_counts
+      - binary_sensor-any_presence
+
+  rules:
+  - name: Get presence updates
+    condition: |
+      event.data.value == 1
+    action:
+      run_playbook:
+        name: scare_kids.yml

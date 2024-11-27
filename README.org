@@ -1,0 +1,86 @@
+#+title: README
+* Using plugins
+Install dependencies:
+#+begin_src shell
+find ./plugins -name requirements.txt | xargs -rn1 pip3 install -r
+#+end_src
+
+#+begin_src shell
+ansible-rulebook -i inventory/all.yml -r rulebooks/mqtt.yml -S plugins/event_source/
+#+end_src
+
+With Vault:
+#+begin_src shell
+ansible-rulebook -vv -i inventory/all.yml -e group_vars/all/vault.yml -S plugins/event_source/ -r rulebooks/http_sse.yml --vault-password-file ./.vault_pass.txt
+#+end_src
+
+#+begin_src shell
+ansible-rulebook -i demo -r rulebooks/friday_afternoon_drinks.yml -S plugins/event_source/ --vault-password-file ./.vault_pass.txt -e group_vars/all/vault.yml
+#+end_src
+
+* Debugging MQTT
+** DONE Unspecified error
+Published to mqtt using Ansible:
+#+begin_src json
+{
+	"tst":	"2024-10-21T22:14:35.660013+0200",
+	"topic":	"zigbee2mqtt/Office RGB LED strip",
+	"qos":	0,
+	"retain":	0,
+	"payloadlen":	24,
+	"payload":	{
+		"state":	"TOGGLE"
+	}
+}
+#+end_src
+
+Ansible code:
+#+begin_src yaml
+  - name: Publish a message on an MQTT topic
+    community.general.mqtt:
+      server: 192.168.1.243
+      topic: 'zigbee2mqtt/Office RGB LED strip'
+      payload: |
+        {
+          "state": "TOGGLE"
+        }
+      qos: 0
+      retain: False
+#+end_src
+
+Topic was missing =/set=.
+* UniFi API
+Getting clients:
+#+begin_src shell :wrap src json
+curl 'https://unifi.petardo.dk/v2/api/site/default/clients/active?includeTrafficUsage=true&includeUnifiDevices=true' --compressed -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:130.0) Gecko/20100101 Firefox/130.0' -H 'Accept: application/json, text/plain, */*' -H 'Accept-Language: en-GB,en-US;q=0.7,en;q=0.3' -H 'Accept-Encoding: gzip, deflate, br, zstd' -H 'Referer: https://unifi.petardo.dk/manage/default/dashboard' -H 'X-Csrf-Token: JdOKcma4CtkaKCBograw5avQg46Cv4f6' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Cookie: unifises=HELk47hLWWbHfAZV0FPnUnVn9qiFFkms; csrf_token=JdOKcma4CtkaKCBograw5avQg46Cv4f6' -H 'Sec-Fetch-Dest: empty' -H 'Sec-Fetch-Mode: cors' -H 'Sec-Fetch-Site: same-origin' -H 'Priority: u=4' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache'
+#+end_src
+
+#+begin_src shell
+curl 'https://unifi.petardo.dk/api/s/default/rest/user/6424769ec9e77c0099fd3e6f' --compressed -X PUT -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:130.0) Gecko/20100101 Firefox/130.0' -H 'Accept: application/json, text/plain, */*' -H 'Accept-Language: en-GB,en-US;q=0.7,en;q=0.3' -H 'Accept-Encoding: gzip, deflate, br, zstd' -H 'Referer: https://unifi.petardo.dk/manage/default/clients/online' -H 'Content-Type: application/json' -H 'X-Csrf-Token: 6Zq2dkCGqioBLftaWEC4tGZGQ2QEGdTc' -H 'Origin: https://unifi.petardo.dk' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Cookie: unifises=fRU6PP4s95JHeNEDoUeKB4S8qmpS7ThS; csrf_token=6Zq2dkCGqioBLftaWEC4tGZGQ2QEGdTc' -H 'Sec-Fetch-Dest: empty' -H 'Sec-Fetch-Mode: cors' -H 'Sec-Fetch-Site: same-origin' -H 'Priority: u=0' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' --data-raw '{"local_dns_record_enabled":false,"local_dns_record":"","name":"User tablet","virtual_network_override_enabled":false,"virtual_network_override_id":"","usergroup_id":"5ff6a0c246e0fb01138ed94f","use_fixedip":false,"fixed_ip":"192.168.1.241","fixed_ap_enabled":false}'
+#+end_src
+
+Login:
+#+begin_src shell
+curl 'https://unifi.petardo.dk/api/login' -X POST -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:130.0) Gecko/20100101 Firefox/130.0' -H 'Accept: */*' -H 'Accept-Language: en-GB,en-US;q=0.7,en;q=0.3' -H 'Accept-Encoding: gzip, deflate, br, zstd' -H 'Referer: https://unifi.petardo.dk/manage/account/login' -H 'Content-Type: application/json; charset=utf-8' -H 'Origin: https://unifi.petardo.dk' -H 'DNT: 1' -H 'Connection: keep-alive' -H 'Sec-Fetch-Dest: empty' -H 'Sec-Fetch-Mode: cors' -H 'Sec-Fetch-Site: same-origin' -H 'Priority: u=0' -H 'Pragma: no-cache' -H 'Cache-Control: no-cache' --data-raw '{"username":"runejuhl","password":"PASSWORD","remember":true,"strict":true}'
+#+end_src
+
+#+begin_src shell
+curl -b /tmp/cookies -c /tmp/cookies 'https://unifi.petardo.dk/api/login' -H 'Content-Type: application/json; charset=utf-8' --data-raw '{"username":"unusual","password":"unusual-ansible","remember":false,"strict":true}'
+#+end_src
+
+#+RESULTS:
+| {"meta":{"rc":"ok"} | data:[]} |
+
+#+begin_src shell :output wrap json
+curl -b /tmp/cookies -c /tmp/cookies 'https://unifi.petardo.dk/api/s/default/rest/user/6424769ec9e77c0099fd3e6f' \
+  -X PUT \
+  -H 'Content-Type: application/json' \
+  -H "X-Csrf-Token: $(grep csrf_token /tmp/cookies | awk '{print $NF}')" \
+  --data-raw '{"local_dns_record_enabled":false,"local_dns_record":"","name":"user tablet","virtual_network_override_enabled":false,"virtual_network_override_id":"","usergroup_id":"5ff6a0c246e0fb01138ed94f","use_fixedip":false,"fixed_ip":"192.168.1.241","fixed_ap_enabled":false}'
+#+end_src
+
+Building decision environment
+#+begin_src shell
+ansible-builder build --tag git.petardo.dk/runejuhl/unusual-ansible/de-ubi9-minimal:latest -f ./decision_environments/minimal.yml -v2
+ansible-builder build --tag git.petardo.dk/runejuhl/unusual-ansible/de-ubi9-fat:latest -f ./decision_environments/fixed.yml -v2
+#+end_src

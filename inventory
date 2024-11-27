@@ -1,0 +1,8 @@
+---
+all:
+  hosts:
+    localhost:
+    drinks:
+      ansible_host: drinks.net.petardo.dk
+    aegir:
+      ansible_host: aegir.net.petardo.dk

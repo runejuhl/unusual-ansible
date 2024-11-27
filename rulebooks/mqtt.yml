@@ -1,0 +1,16 @@
+---
+- name: mqtt events
+  hosts: localhost
+  sources:
+    - runejuhl.unusual_ansible.mqtt:
+        host: 192.168.1.243
+        # We're only interested in events one level down from `zigbee2mqtt`
+        topic: 'zigbee2mqtt/+'
+
+  rules:
+    - name: Respond to specific topic
+      condition: event.topic == "zigbee2mqtt/Office light switch door"
+      action:
+        run_job_template:
+          name: 'MQTT toggle'
+          organization: Default

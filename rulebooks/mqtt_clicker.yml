@@ -1,0 +1,19 @@
+---
+- name: mqtt clicker
+  hosts: aegir
+  sources:
+    - runejuhl.unusual_ansible.mqtt:
+        host: 'drinks.net.petardo.dk'
+        # We're only interested in events one level down from `zigbee2mqtt`
+        topic: 'zigbee2mqtt/+'
+
+  rules:
+    - name: Respond to specific topic
+      condition: |
+        event.topic == "zigbee2mqtt/clicker"
+        and
+        event.payload.action in ['arrow_left_click', 'arrow_right_click']
+      action:
+        run_job_template:
+          name: mqtt_clicker
+          organization: Default

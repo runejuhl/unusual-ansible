@@ -1,0 +1,10 @@
+---
+- name: Dump event
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+  - name: Dump event
+    ansible.builtin.debug:
+      msg: |
+        {{ ansible_eda }}

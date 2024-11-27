@@ -1,0 +1,20 @@
+---
+- name: mqtt events
+  hosts: localhost
+  sources:
+    - mqtt:
+        host: 192.168.1.243
+        # We're only interested in events one level down from `zigbee2mqtt`
+        topic: 'zigbee2mqtt/+'
+
+  rules:
+    - name: Any event
+      condition:
+        all:
+        - event.meta.source.name == 'mqtt'
+        # Friday November 1 2024 after 15
+        - event.meta.received_at is match('2024-11-01T14:')
+        - event.meta.received_at is match('2024-11-01T15:')
+      action:
+        run_playbook:
+          name: ./playbooks/dump_event.yml

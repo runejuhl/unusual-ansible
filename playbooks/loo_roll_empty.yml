@@ -1,0 +1,19 @@
+---
+- name: |-
+    Loo roll empty notification
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+  - name: Notify
+    ansible.builtin.uri:
+      url: '{{ hass_baseurl }}/api/services/notify/{{ hass_rune_app_id }}'
+      method: POST
+      headers:
+        content-type: 'application/json'
+        Authorization: |-
+          Bearer {{ hass_token }}
+      body:
+        title: Loo roll empty, again!
+        message: Whodunnit?
+      body_format: 'json'

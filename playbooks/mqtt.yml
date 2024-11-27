@@ -1,0 +1,14 @@
+---
+- name: Toggle something
+  hosts: localhost
+  gather_facts: false
+  tasks:
+
+  - name: Publish a message on an MQTT topic
+    community.general.mqtt:
+      server: '{{ mqtt_server }}'
+      topic: 'zigbee2mqtt/Office RGB LED strip/set'
+      payload: |
+        {
+          "state": "TOGGLE"
+        }

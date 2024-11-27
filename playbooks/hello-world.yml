@@ -1,0 +1,16 @@
+---
+- name: Hello World
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: set some fact
+      ansible.builtin.set_fact:
+        cacheable: true
+        the_meaning: 42
+
+    # - name: Print hello
+    #   ansible.builtin.debug:
+    #     msg: |
+    #       hello
+
+    #       this is the event speaking, the meaning is {{ the_meaning }}, and i is {{ event.i }}

@@ -1,0 +1,7 @@
+/.venv/
+*~
+/collections/
+/galaxy_cache/
+/galaxy_token
+/.vault_pass.txt
+/context/
