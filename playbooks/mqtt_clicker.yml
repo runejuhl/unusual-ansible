@@ -13,3 +13,20 @@
         wtype -k {% if ansible_eda.event.payload.action == 'arrow_left_click' %}Prior{% elif ansible_eda.event.payload.action == 'arrow_right_click' %}Next{% endif %}
     environment:
       WAYLAND_DISPLAY: "wayland-1"
+    when: |-
+      ansible_eda.event.payload.action in ['arrow_right_click', 'arrow_left_click']
+
+  - ansible.builtin.uri:
+      url: '{{ hass_baseurl }}/api/states/person.rune'
+      method: POST
+      headers:
+        content-type: 'application/json'
+        Authorization: |-
+          Bearer {{ hass_token }}
+      return_content: true
+      body:
+        state: 'vue'
+      body_format: 'json'
+    register: response
+    when: |-
+      ansible_eda.event.payload.action in ['on']

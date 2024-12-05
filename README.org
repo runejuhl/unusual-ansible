@@ -15,7 +15,7 @@ ansible-rulebook -vv -i inventory/all.yml -e group_vars/all/vault.yml -S plugins
 #+end_src
 
 #+begin_src shell
-ansible-rulebook -i demo -r rulebooks/friday_afternoon_drinks.yml -S plugins/event_source/ --vault-password-file ./.vault_pass.txt -e group_vars/all/vault.yml
+ansible-rulebook -i inventory -r rulebooks/friday_afternoon_drinks.yml -S plugins/event_source/ --vault-password-file ./.vault_pass.txt -e group_vars/all/vault.yml
 #+end_src
 
 * Debugging MQTT

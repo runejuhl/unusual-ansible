@@ -12,7 +12,7 @@
       condition: |
         event.topic == "zigbee2mqtt/clicker"
         and
-        event.payload.action in ['arrow_left_click', 'arrow_right_click']
+        event.payload.action in ['arrow_left_click', 'arrow_right_click', 'on']
       action:
         run_job_template:
           name: mqtt_clicker

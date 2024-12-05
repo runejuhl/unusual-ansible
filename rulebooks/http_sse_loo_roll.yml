@@ -4,7 +4,7 @@
   default_events_ttl: "2 seconds"
   match_multiple_rules: false
   sources:
-  - http_sse:
+  - runejuhl.unusual_ansible.http_sse:
       url: '{{ loo_roll_basename }}/events'
       event_ids:
       - binary_sensor-toilet_paper_situation_
@@ -16,6 +16,19 @@
       - event.data.value
 
     actions:
+    - print_event:
+        pretty: true
+
     - run_job_template:
         name: loo_roll_empty
         organization: Default
+
+    - run_job_template:
+        name: send_notification
+        organization: Default
+        job_args:
+          extra_vars:
+            message: |-
+              TP roll empty!
+            icon: |-
+              /usr/share/notify-osd/icons/Humanity/scalable/status/notification-printer-error.svg
