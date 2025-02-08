@@ -1,4 +1,11 @@
-#+title: README
+#+title: Unusual Ansible
+Stuff for talks I held under the title "Unusual Ansible", showcasing how you can
+use Ansible Automation Platform and Event-Driven Ansible for Home Automation.
+
+* Presentations
++ [[./presentations/2024-10-29 Red Hat Summit Connect 2024.pdf][Red Hat Summit: Connect 2024 in Copenhagen, Denmark]]
++ [[./presentations/2024-12-05 Atea Tech Tour Århus - Rune Juhl.pdf][Atea Tech Tour Århus 2024]]
+
 * Using plugins
 Install dependencies:
 #+begin_src shell
